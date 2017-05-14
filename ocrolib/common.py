@@ -279,7 +279,7 @@ def read_page_segmentation(fname):
     segmentation = make_seg_black(segmentation)
     return segmentation
 
-@checks(str,PAGESEG)
+@checks(str,_=PAGESEG)
 def write_page_segmentation(fname,image):
     """Writes a page segmentation, that is an RGB image whose values
     encode the segmentation of a page."""
