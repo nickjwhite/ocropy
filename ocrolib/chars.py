@@ -21,6 +21,10 @@ default = ascii+xsymbols+german+french+portuguese
 
 european = default+turkish+greek
 
+# Rescribe's characters
+rescribe = u"æœſ"
+default = ascii+rescribe
+
 # List of regular expressions for normalizing Unicode text.
 # Cleans up common homographs. This is mostly used for
 # training text.
