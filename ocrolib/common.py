@@ -105,7 +105,7 @@ def write_text(fname,text,nonl=0,normalize=1):
         text = normalize_text(text)
     with codecs.open(fname,"w","utf-8") as stream:
         stream.write(text)
-        if not nonl and text[-1]!='\n':
+        if not nonl and text and text[-1]!='\n':
             stream.write('\n')
 
 ################################################################
