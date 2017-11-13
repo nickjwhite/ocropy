@@ -22,7 +22,7 @@ default = ascii+xsymbols+german+french+portuguese
 european = default+turkish+greek
 
 # Rescribe's characters
-rescribe = u"æœſ"
+rescribe = u"æœſqͦ"
 default = ascii+rescribe
 
 # List of regular expressions for normalizing Unicode text.
