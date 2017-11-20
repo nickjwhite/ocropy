@@ -951,7 +951,7 @@ class Codec:
         charset = sorted(list(set(charset)))
         self.code2char = {}
         self.char2code = {}
-        for code,char in enumerate(charset):
+        for code,char in enumerate(self.itergraphemes(charset)):
             self.code2char[code] = char
             self.char2code[char] = code
         return self
@@ -968,6 +968,15 @@ class Codec:
         "Decode a code sequence into a string."
         s = [self.code2char.get(c,"~") for c in l]
         return s
+    def itergraphemes(str):
+        "Based on https://gist.github.com/dpk/5694265"
+        def modifierp(char): return unicodedata.category(char)[0] == 'M'
+        start = 0
+        for end, char in enumerate(str):
+            if not modifierp(char) and not start == end:
+                yield str[start:end]
+                start = end
+        yield str[start:]
 
 ascii_labels = [""," ","~"] + [unichr(x) for x in range(33,126)]
 
