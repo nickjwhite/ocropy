@@ -103,25 +103,16 @@ def sumprod(us,vs,lo=-1.0,hi=1.0,out=None):
     return result
 
 def graphemelist(str):
-    "Based on https://gist.github.com/dpk/5694265"
     l = list()
-    start = 0
-    for end, char in enumerate(str):
-        if not unicodedata.category(char)[0] == 'M' and not start == end:
-            l.append(str[start:end])
-            start = end
-        l.append(str[start:])
+    s = ""
+    for char in str:
+        if unicodedata.category(char)[0] == 'M':
+            s += char
+        else:
+            l.append(s)
+            s = char
+    l.append(s)
     return l
-
-def itergraphemes(str):
-    "Based on https://gist.github.com/dpk/5694265"
-    def modifierp(char): return unicodedata.category(char)[0] == 'M'
-    start = 0
-    for end, char in enumerate(str):
-        if not modifierp(char) and not start == end:
-            yield str[start:end]
-            start = end
-    yield str[start:]
 
 class Network:
     """General interface for networks. This mainly adds convenience
@@ -984,7 +975,7 @@ class Codec:
         "Encode the string `s` into a code sequence."
         # tab = self.char2code
         dflt = self.char2code["~"]
-        return [self.char2code.get(c,dflt) for c in s]
+        return [self.char2code.get(c,dflt) for c in graphemelist(s)]
     def decode(self,l):
         "Decode a code sequence into a string."
         s = [self.code2char.get(c,"~") for c in l]
