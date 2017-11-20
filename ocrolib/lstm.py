@@ -102,6 +102,27 @@ def sumprod(us,vs,lo=-1.0,hi=1.0,out=None):
         result += clip(u,lo,hi)*v
     return result
 
+def graphemelist(str):
+    "Based on https://gist.github.com/dpk/5694265"
+    l = list()
+    start = 0
+    for end, char in enumerate(str):
+        if not unicodedata.category(char)[0] == 'M' and not start == end:
+            l.append(str[start:end])
+            start = end
+        l.append(str[start:])
+    return l
+
+def itergraphemes(str):
+    "Based on https://gist.github.com/dpk/5694265"
+    def modifierp(char): return unicodedata.category(char)[0] == 'M'
+    start = 0
+    for end, char in enumerate(str):
+        if not modifierp(char) and not start == end:
+            yield str[start:end]
+            start = end
+    yield str[start:]
+
 class Network:
     """General interface for networks. This mainly adds convenience
     functions for `predict` and `train`.
@@ -948,8 +969,7 @@ class SeqRecognizer:
 class Codec:
     """Translate between integer codes and characters."""
     def init(self,charset):
-	graphemes = self.itergraphemes("".join(charset))
-        charset = sorted(list(set(graphemes)))
+        charset = sorted(list(set(charset)))
         self.code2char = {}
         self.char2code = {}
         for code,char in enumerate(charset):
@@ -969,15 +989,6 @@ class Codec:
         "Decode a code sequence into a string."
         s = [self.code2char.get(c,"~") for c in l]
         return s
-    def itergraphemes(self,str):
-        "Based on https://gist.github.com/dpk/5694265"
-        def modifierp(char): return unicodedata.category(char)[0] == 'M'
-        start = 0
-        for end, char in enumerate(str):
-            if not modifierp(char) and not start == end:
-                yield str[start:end]
-                start = end
-        yield str[start:]
 
 ascii_labels = [""," ","~"] + [unichr(x) for x in range(33,126)]
 
