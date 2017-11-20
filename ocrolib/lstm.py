@@ -948,10 +948,11 @@ class SeqRecognizer:
 class Codec:
     """Translate between integer codes and characters."""
     def init(self,charset):
-        charset = sorted(list(set(charset)))
+	graphemes = self.itergraphemes("".join(charset))
+        charset = sorted(list(set(graphemes)))
         self.code2char = {}
         self.char2code = {}
-        for code,char in enumerate(self.itergraphemes(charset)):
+        for code,char in enumerate(charset):
             self.code2char[code] = char
             self.char2code[char] = code
         return self
@@ -968,7 +969,7 @@ class Codec:
         "Decode a code sequence into a string."
         s = [self.code2char.get(c,"~") for c in l]
         return s
-    def itergraphemes(str):
+    def itergraphemes(self,str):
         "Based on https://gist.github.com/dpk/5694265"
         def modifierp(char): return unicodedata.category(char)[0] == 'M'
         start = 0
