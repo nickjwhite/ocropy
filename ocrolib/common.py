@@ -24,6 +24,7 @@ import pylab
 from pylab import (clf, cm, ginput, gray, imshow, ion, subplot, where)
 from scipy.ndimage import morphology, measurements
 import PIL
+from PIL import Image
 
 from default import getlocal
 from toplevel import (checks, ABINARY2, AINT2, AINT3, BOOL, DARKSEG, GRAYSCALE,
@@ -104,7 +105,7 @@ def write_text(fname,text,nonl=0,normalize=1):
         text = normalize_text(text)
     with codecs.open(fname,"w","utf-8") as stream:
         stream.write(text)
-        if not nonl and text[-1]!='\n':
+        if not nonl and text and text[-1]!='\n':
             stream.write('\n')
 
 ################################################################
@@ -130,13 +131,13 @@ def pil2array(im,alpha=0):
 def array2pil(a):
     if a.dtype==dtype("B"):
         if a.ndim==2:
-            return PIL.Image.frombytes("L",(a.shape[1],a.shape[0]),a.tostring())
+            return Image.frombytes("L",(a.shape[1],a.shape[0]),a.tostring())
         elif a.ndim==3:
-            return PIL.Image.frombytes("RGB",(a.shape[1],a.shape[0]),a.tostring())
+            return Image.frombytes("RGB",(a.shape[1],a.shape[0]),a.tostring())
         else:
             raise OcropusException("bad image rank")
     elif a.dtype==dtype('float32'):
-        return PIL.Image.fromstring("F",(a.shape[1],a.shape[0]),a.tostring())
+        return Image.fromstring("F",(a.shape[1],a.shape[0]),a.tostring())
     else:
         raise OcropusException("unknown image type")
 
@@ -160,7 +161,7 @@ def read_image_gray(fname,pageno=0):
     the range 0...1 (unsigned) or -1...1 (signed)."""
     if type(fname)==tuple: fname,pageno = fname
     assert pageno==0
-    pil = PIL.Image.open(fname)
+    pil = Image.open(fname)
     a = pil2array(pil)
     if a.dtype==dtype('uint8'):
         a = a/255.0
@@ -197,7 +198,7 @@ def read_image_binary(fname,dtype='i',pageno=0):
     of the given dtype."""
     if type(fname)==tuple: fname,pageno = fname
     assert pageno==0
-    pil = PIL.Image.open(fname)
+    pil = Image.open(fname)
     a = pil2array(pil)
     if a.ndim==3: a = amax(a,axis=2)
     return array(a>0.5*(amin(a)+amax(a)),dtype)
@@ -251,7 +252,7 @@ def make_seg_white(image):
 def read_line_segmentation(fname):
     """Reads a line segmentation, that is an RGB image whose values
     encode the segmentation of a text line.  Returns an int array."""
-    pil = PIL.Image.open(fname)
+    pil = Image.open(fname)
     a = pil2array(pil)
     assert a.dtype==dtype('B')
     assert a.ndim==3
@@ -271,7 +272,7 @@ def write_line_segmentation(fname,image):
 def read_page_segmentation(fname):
     """Reads a page segmentation, that is an RGB image whose values
     encode the segmentation of a page.  Returns an int array."""
-    pil = PIL.Image.open(fname)
+    pil = Image.open(fname)
     a = pil2array(pil)
     assert a.dtype==dtype('B')
     assert a.ndim==3
