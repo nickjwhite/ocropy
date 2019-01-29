@@ -105,7 +105,7 @@ def write_text(fname,text,nonl=0,normalize=1):
         text = normalize_text(text)
     with codecs.open(fname,"w","utf-8") as stream:
         stream.write(text)
-        if not nonl and text and text[-1]!='\n':
+        if not nonl and (len(text) == 0 or text[-1] != '\n'):
             stream.write('\n')
 
 ################################################################
@@ -622,8 +622,10 @@ def ocropus_find_file(fname, gz=True):
 
     possible_prefixes.append("/usr/local/share/ocropus")
 
-    possible_prefixes.append(os.path.join(
-        sysconfig.get_config_var("datarootdir"), "ocropus"))
+    # datarootdir is None in windows so don't add it to search list
+    if sysconfig.get_config_var("datarootdir") is not None:
+        possible_prefixes.append(os.path.join(
+            sysconfig.get_config_var("datarootdir"), "ocropus"))
 
 
     # Unique entries with preserved order in possible_prefixes
@@ -765,37 +767,6 @@ def ustrg2unicode(u,lig=ligatures.lig):
             else:
                 result += "<%d>"%value
     return result
-
-### code for instantiation native components
-
-def pyconstruct(s):
-    """Constructs a Python object from a constructor, an expression
-    of the form x.y.z.name(args).  This ensures that x.y.z is imported.
-    In the future, more forms of syntax may be accepted."""
-    env = {}
-    if "(" not in s:
-        s += "()"
-    path = s[:s.find("(")]
-    if "." in path:
-        module = path[:path.rfind(".")]
-        print("import", module)
-        exec "import "+module in env
-    return eval(s,env)
-
-def mkpython(name):
-    """Tries to instantiate a Python class.  Gives an error if it looks
-    like a Python class but can't be instantiated.  Returns None if it
-    doesn't look like a Python class."""
-    if name is None or len(name)==0:
-        return None
-    elif type(name) is not str:
-        return name()
-    elif name[0]=="=":
-        return pyconstruct(name[1:])
-    elif "(" in name or "." in name:
-        return pyconstruct(name)
-    else:
-        return None
 
 ################################################################
 ### loading and saving components
