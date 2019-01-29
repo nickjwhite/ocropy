@@ -761,7 +761,7 @@ def translate_back(outputs,threshold=0.7,pos=0):
     mask = tile(labels.reshape(-1,1),(1,outputs.shape[1]))
     maxima = measurements.maximum_position(outputs,mask,arange(1,amax(mask)+1))
     if pos==1: return maxima # include character position
-    if pos==2: return [(c, outputs[r,c]) for (r,c) in maxima] # include character probabilities
+    if pos==2: return [(c, outputs[int(r),int(c)]) for (r,c) in maxima] # include character probabilities
     return [c for (r,c) in maxima] # only recognized characters
 
 def log_mul(x,y):
